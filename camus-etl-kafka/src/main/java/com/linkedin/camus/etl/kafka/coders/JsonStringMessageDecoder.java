@@ -1,13 +1,14 @@
 package com.linkedin.camus.etl.kafka.coders;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.text.SimpleDateFormat;
 
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
-
+import com.google.gson.stream.JsonReader;
 import com.linkedin.camus.coders.CamusWrapper;
 import com.linkedin.camus.coders.MessageDecoder;
 import com.linkedin.camus.coders.MessageDecoderException;
@@ -50,20 +51,30 @@ public class JsonStringMessageDecoder extends MessageDecoder<byte[], String> {
 	public CamusWrapper<String> decode(byte[] payload) {
 		long       timestamp = 0;
 		String     payloadString;
-		JsonObject jsonObject;
+		JsonObject jsonObject=null;
 
 		payloadString =  new String(payload);
-
+		payloadString.replaceAll("\\\\x22", "\"").replaceAll("\\x22","\"");
+		payloadString = payloadString.replaceAll("x5C", "").replaceAll("\\x0A", "").replaceAll("\\x09", "");
+			
+		
+	
+		StringReader payloadReader= new StringReader(payloadString);
 		// Parse the payload into a JsonObject.
 		try {
-			jsonObject = new JsonParser().parse(payloadString).getAsJsonObject();
+			JsonReader jsonReader= new JsonReader(payloadReader);
+			jsonReader.setLenient(true);
+			jsonObject = new JsonParser().parse(jsonReader).getAsJsonObject();		
+			
+	//jsonObject=null;
+			//jsonObject = new JsonParser().parse(payloadString).getAsJsonObject();
 		} catch (RuntimeException e) {
 			log.error("Caught exception while parsing JSON string '" + payloadString + "'.");
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
 		}
 
 		// Attempt to read and parse the timestamp element into a long.
-		if (jsonObject.has(timestampField)) {
+		if (null!=jsonObject && jsonObject.has(timestampField)) {
 			String timestampString = jsonObject.get(timestampField).getAsString();
 			try {
 				timestamp = new SimpleDateFormat(timestampFormat).parse(timestampString).getTime();

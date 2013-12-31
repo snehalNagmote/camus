@@ -323,7 +323,11 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 			EtlKey key = offsetKeys.get(request);
 
 			if (key != null) {
-				request.setOffset(key.getOffset());
+				// request.setOffset(key.getOffset());
+				// The KafkaReader will read from [offset, latest)
+           			// We save the last value we read successfully (latest - 1) so we 
+           			// need to increment here so we don't re-read (latest-1)
+         			request.setOffset(key.getOffset() + 1);
 			}
 
 			if (request.getEarliestOffset() > request.getOffset()

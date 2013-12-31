@@ -63,7 +63,10 @@ public class KafkaReader {
 		kafkaRequest = request;
 
 		beginOffset = request.getOffset();
-		currentOffset = request.getOffset();
+		//currentOffset = request.getOffset();
+		// By setting currentOffset to offset - 1 we are effectively making it read 
+     		// [offset, lastOffset)
+     		currentOffset = request.getOffset() - 1;
 		lastOffset = request.getLastOffset();
 		currentCount = 0;
 		totalFetchTime = 0;
