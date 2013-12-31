@@ -1,3 +1,10 @@
+Original project 
+https://github.com/linkedin/camus
+
+Changed to work with hadoop 2.0 and fixed JsonStringMessageDecoder to skip  invalid Json messages
+
+
+
 # Intro
 Camus is LinkedIn's [Kafka](http://kafka.apache.org "Kafka")->HDFS pipeline. It is a mapreduce job that does distributed data loads out of Kafka. It includes the following features:
 
