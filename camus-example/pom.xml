@@ -42,8 +42,8 @@
         <groupId>org.apache.avro</groupId>
         <artifactId>avro-maven-plugin</artifactId>
         <version>1.7.0</version>
-        <executions>
-          <execution>
+       <executions>
+          <!-- <execution>
             <id>schemas</id>
             <phase>generate-sources</phase>
             <goals>
@@ -55,7 +55,7 @@
               <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
               <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
             </configuration>
-          </execution>
+          </execution>   -->
         </executions>
       </plugin>
       <plugin>

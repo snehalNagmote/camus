@@ -13,13 +13,13 @@ public class DefaultPartitioner implements Partitioner {
     protected static final String OUTPUT_DATE_FORMAT = "YYYY/MM/dd/HH";
     protected DateTimeFormatter outputDateFormatter = null;
 
-    @Override
+    //@Override
     public String encodePartition(JobContext context, IEtlKey key) {
         long outfilePartitionMs = EtlMultiOutputFormat.getEtlOutputFileTimePartitionMins(context) * 60000L;
         return ""+DateUtils.getPartition(outfilePartitionMs, key.getTime());
     }
 
-    @Override
+    //@Override
     public String generatePartitionedPath(JobContext context, String topic, int brokerId, int partitionId, String encodedPartition) {
         // We only need to initialize outputDateFormatter with the default timeZone once.
         if (outputDateFormatter == null) {

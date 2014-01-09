@@ -53,21 +53,17 @@ public class JsonStringMessageDecoder extends MessageDecoder<byte[], String> {
 		String     payloadString;
 		JsonObject jsonObject=null;
 
-		payloadString =  new String(payload);
-		payloadString.replaceAll("\\\\x22", "\"").replaceAll("\\x22","\"");
-		payloadString = payloadString.replaceAll("x5C", "").replaceAll("\\x0A", "").replaceAll("\\x09", "");
-			
-		
+		payloadString=new String(payload);
 	
-		StringReader payloadReader= new StringReader(payloadString);
+		//StringReader payloadReader= new StringReader(payloadString);
 		// Parse the payload into a JsonObject.
 		try {
-			JsonReader jsonReader= new JsonReader(payloadReader);
+			/*JsonReader jsonReader= new JsonReader(payloadReader);
 			jsonReader.setLenient(true);
-			jsonObject = new JsonParser().parse(jsonReader).getAsJsonObject();		
+			jsonObject = new JsonParser().parse(jsonReader).getAsJsonObject();	*/	
 			
-	//jsonObject=null;
-			//jsonObject = new JsonParser().parse(payloadString).getAsJsonObject();
+	
+		jsonObject = new JsonParser().parse(payloadString).getAsJsonObject();
 		} catch (RuntimeException e) {
 			log.error("Caught exception while parsing JSON string '" + payloadString + "'.");
 			//throw new RuntimeException(e);
