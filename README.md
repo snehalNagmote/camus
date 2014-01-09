@@ -10,6 +10,8 @@ Added new decoder LogFormatLoadTimeMessageDecoder to handle string log format an
 
 Change decoder to com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDecoder
 
+camus.message.decoder.class=com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDecoder
+
 
 
 
