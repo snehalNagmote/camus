@@ -1,7 +1,19 @@
 Original project 
 https://github.com/linkedin/camus
 
+
+
+
 Changed to work with hadoop 2.0 and fixed JsonStringMessageDecoder to skip  invalid Json messages
+
+Added new decoder LogFormatLoadTimeMessageDecoder to handle string log format and ignore event timestamp as the events would be stored in hdfs by load time utc
+
+Change decoder to com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDecoder
+
+camus.message.decoder.class=com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDecoder
+
+
+
 
 
 
