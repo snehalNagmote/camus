@@ -85,6 +85,7 @@ public class CamusJob extends Configured implements Tool {
 	public static final String KAFKA_HOST_URL = "kafka.host.url";
 	public static final String KAFKA_HOST_PORT = "kafka.host.port";
 	public static final String KAFKA_TIMEOUT_VALUE = "kafka.timeout.value";
+	public static final String ETL_PARTITIONER_CLASS = "etl.partitioner.class";
 	public static final String LOG4J_CONFIGURATION = "log4j.configuration";
 	private static org.apache.log4j.Logger log = Logger
 			.getLogger(CamusJob.class);
@@ -120,38 +121,39 @@ public class CamusJob extends Configured implements Tool {
 	}
 
 	private Job createJob(Properties props) throws IOException {
-		
-		if(getConf() == null)
-		{
+
+		if (getConf() == null) {
 			Configuration conf = new Configuration();
-			for(Object key : props.keySet())
-			{
+			for (Object key : props.keySet()) {
 				conf.set(key.toString(), props.getProperty(key.toString()));
 			}
 			setConf(conf);
 		}
-		
+
 		Job job = new Job(getConf());
 		job.setJarByClass(CamusJob.class);
-		
-
-		// Set the default partitioner
-		job.getConfiguration().set(
-				EtlMultiOutputFormat.ETL_DEFAULT_PARTITIONER_CLASS,
-				"com.linkedin.camus.etl.kafka.coders.DefaultPartitioner");
 
 		for (Object key : props.keySet()) {
 			job.getConfiguration().set(key.toString(),
 					props.getProperty(key.toString()));
 		}
-			
+
+		String partitionerClass = getCustomPartitioner(job);
+		if (partitionerClass == null) {
+			partitionerClass = "com.linkedin.camus.etl.kafka.coders.DefaultPartitioner";
+		}
+
+		// Set the default partitioner
+		job.getConfiguration().set(
+				EtlMultiOutputFormat.ETL_DEFAULT_PARTITIONER_CLASS,
+				partitionerClass);
+		log.info("Checking Partitioner Class" + partitionerClass);
+
 		job.setJobName("Camus Job");
-		if(job.getConfiguration().get("camus.job.name") != null)
-		{
+		if (job.getConfiguration().get("camus.job.name") != null) {
 			job.setJobName(job.getConfiguration().get("camus.job.name"));
 		}
-		
-		
+
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 
 		String hadoopCacheJarDir = job.getConfiguration().get(
@@ -563,7 +565,7 @@ public class CamusJob extends Configured implements Tool {
 	}
 
 	@SuppressWarnings("static-access")
-	//@Override
+	// @Override
 	public int run(String[] args) throws Exception {
 		Options options = new Options();
 
@@ -584,8 +586,8 @@ public class CamusJob extends Configured implements Tool {
 		}
 
 		if (cmd.hasOption('p'))
-		    props.load(this.getClass().getClassLoader().getResourceAsStream(
-                    cmd.getOptionValue('p')));
+			props.load(this.getClass().getClassLoader()
+					.getResourceAsStream(cmd.getOptionValue('p')));
 
 		if (cmd.hasOption('P')) {
 			File file = new File(cmd.getOptionValue('P'));
@@ -620,9 +622,12 @@ public class CamusJob extends Configured implements Tool {
 		if (brokers == null) {
 			brokers = job.getConfiguration().get(KAFKA_HOST_URL);
 			if (brokers != null) {
-				log.warn("The configuration properties " + KAFKA_HOST_URL + " and " + 
-					KAFKA_HOST_PORT + " are deprecated. Please switch to using " + KAFKA_BROKERS);
-				return brokers + ":" + job.getConfiguration().getInt(KAFKA_HOST_PORT, 10251);
+				log.warn("The configuration properties " + KAFKA_HOST_URL
+						+ " and " + KAFKA_HOST_PORT
+						+ " are deprecated. Please switch to using "
+						+ KAFKA_BROKERS);
+				return brokers + ":"
+						+ job.getConfiguration().getInt(KAFKA_HOST_PORT, 10251);
 			}
 		}
 		return brokers;
@@ -654,4 +659,9 @@ public class CamusJob extends Configured implements Tool {
 	public static boolean getLog4jConfigure(JobContext job) {
 		return job.getConfiguration().getBoolean(LOG4J_CONFIGURATION, false);
 	}
+
+	public static String getCustomPartitioner(JobContext job) {
+		return job.getConfiguration().get(ETL_PARTITIONER_CLASS);
+	}
+
 }
