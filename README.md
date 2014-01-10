@@ -12,6 +12,8 @@ Change decoder to com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDe
 
 camus.message.decoder.class=com.linkedin.camus.etl.kafka.coders.LogFormatLoadTimeMessageDecoder
 
+Added new custom partitioner which will store data in 15 mins bucket in HDFS.
+
 
 
 
